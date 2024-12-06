@@ -1,0 +1,32 @@
+1、调出 pwmchip2 的 pwm0 子目录
+echo 0 > /sys/class/pwm/pwmchip2/export
+
+输入如下命令使能 PWM3：
+echo 1 > /sys/class/pwm/pwmchip2/pwm0/enable
+
+Linux内核通过sysfs支持硬件PWM，所以这个部分的内容不仅限于树莓派，实际上所有实现了对应驱动的开发板都一样。
+
+树莓派的raspbian系统映像已经提供了对应的驱动，可以直接使用。修改并保存/boot/config.txt之后重启设备，如果设置正确，可以在目录/sys/class/pwm中看到一些东西，比如：
+
+$ ls /sys/class/pwm
+pwmchip0
+$ ls /sys/class/pwm/pwmchip0
+device  export  npwm  power  pwm0  subsystem  uevent  unexport
+这些伪文件就是Linux内核PWM驱动提供的操纵接口，在shell里可以通过cat读，通过echo重定向写。在任意编程语言里也可以通过读写文件的接口进行同样的操作。
+
+首先创建一个PWM的导出，向export写几，就会创建对应的目录在pwmchipX里面：
+
+$ echo 0 >/sys/class/pwm/pwmchip0/export
+$ ls /sys/class/pwm/pwmchip0/pwm0
+capture  duty_cycle  enable  period  polarity  power  uevent
+这里面，period是以纳秒计数的PWM周期，duty_cycle是以纳秒计数的每周期高电平时间。比如我想要一个20KHz的PWM，占空比为80%，那我就应当：
+
+$ cd /sys/class/pwm/pwmchip0/pwm0
+$ echo 50000 >period # 两万Hz的时长是五万纳秒
+$ echo 10000 >duty_cycle # 占空比80%，那么20%的时长就是一万纳秒
+然后向enable写0或者1进行开关。
+
+$ echo 1 >enable # 立即开启
+关闭之后不会清空原有设置，再次打开会以之前设置的参数运行PWM。
+
+如果需要释放资源，向/sys/clas/pwm/pwmchipX/unexport写对应的序号，会清空对应的PWM导出目录，并且删除配置。

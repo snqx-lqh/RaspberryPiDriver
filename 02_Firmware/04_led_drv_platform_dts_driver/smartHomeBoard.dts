@@ -1,0 +1,25 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+  fragment@0 {
+    target-path = "/";
+    __overlay__ {
+      shbled:shbled@0x3f200000 {
+        #address-cells = <1>;
+	      #size-cells = <1>;
+        compatible = "shb-led";
+        status = "okay";
+        reg = <
+            0x3F200000 0X04    /* BCM2837_GPIO_FSEL0 */
+            0x3F200004 0X04    /* BCM2837_GPIO_FSEL1 */
+            0x3F200008 0X04    /* BCM2837_GPIO_FSEL2 */
+            0x3F20001C 0X04    /* BCM2837_GPIO_SET0  */
+            0x3F200028 0X04    /* BCM2837_GPIO_CLR0  */
+            0x3F200034 0X04 >; /* BCM2837_GPIO_LEV0  */
+      };
+    };
+  };
+};
+
+

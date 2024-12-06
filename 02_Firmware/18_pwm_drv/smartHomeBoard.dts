@@ -1,0 +1,132 @@
+// Definitions for gpio-key module
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "brcm,bcm2835";
+
+	fragment@0{
+		target-path = "/";
+		__overlay__ {
+			shbled: shbled@0 {
+				compatible = "shb-led";
+				pinctrl-names = "default";
+				pinctrl-0 = <&shbled_pins>;
+				status = "okay";
+
+				led1-gpios = <&gpio 17 0>;	
+				led2-gpios = <&gpio 27 0>;	
+				led3-gpios = <&gpio 22 0>;	
+				led4-gpios = <&gpio 23 0>;	
+			};
+
+			shb_key: shb_key@0{
+				compatible = "shb-key";
+				pinctrl-names = "default";
+				pinctrl-0  = <&shb_key_pins>;
+				status = "okay";
+
+				key1-gpios = <&gpio 26 0>;
+				key2-gpios = <&gpio 21 0>;
+				key3-gpios = <&gpio 20 0>;
+
+				interrupt-parent = <&gpio>;
+				interrupts = <26 2>,<21 2>,<20 2>;
+			};
+		};
+	};
+
+	fragment@1 {
+		// Configure the gpio pin controller
+		target = <&gpio>;
+		__overlay__ {
+			shbled_pins: shbled_pins@0 {
+				brcm,pins = <17 27 22 23>; // gpio number
+				brcm,function = <1 1 1 1>; // 0 = input, 1 = output
+				brcm,pull = <2 2 2 2>; // 0 = none, 1 = pull down, 2 = pull up
+			};
+			shb_key_pins: shb_key_pins@0 {
+				brcm,pins = <26 21 20>; // gpio number
+				brcm,function = <0 0 0>; // 0 = input, 1 = output
+				brcm,pull = <2 2 2>; // 0 = none, 1 = pull down, 2 = pull up
+			};
+			ssd1306_pins: ssd1306_pins {
+				brcm,pins = <25 24>;
+				brcm,function = <1 1>; /* out out */
+			};
+			pwm_pins: pwm_pins {
+				brcm,pins = <18>;
+				brcm,function = <2>; /* Alt5 */
+			};
+		};
+	};
+
+	fragment@2 {
+		// Configure the gpio pin controller
+		target = <&i2c1>;
+		__overlay__ {
+			clock-frequency = <100000>;
+			status = "okay";
+			pinctrl-names = "default";
+			pinctrl-0 = <&i2c1_pins>;
+			
+			pcf8591@48{
+				compatible = "shb,pcf8591";
+				reg = <0x48>;
+			};
+		};
+	};
+
+	fragment@3 {
+		target = <&i2c1_pins>;
+		pins1: __overlay__ {
+			brcm,pins = <2 3>;
+			brcm,function = <4>; /* alt 0 */
+		};
+	};
+
+	fragment@4 {
+		target = <&spi0>;
+		__overlay__ {
+			/* needed to avoid dtc warning */
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "okay";
+			
+			ssd1306: ssd1306@0{
+				compatible = "solomon,ssd1306";
+				reg = <0>;
+				pinctrl-names = "default";
+				pinctrl-0 = <&ssd1306_pins>;
+				spi-max-frequency = <10000000>;
+				reset-gpios = <&gpio 25 0>;
+				dc-gpios = <&gpio 24 0>;
+			};
+		};
+	};
+
+	fragment@5 {
+		target = <&spidev0>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@6 {
+		target = <&spidev1>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@7 {
+		target = <&pwm>;
+		__overlay__ {
+			pinctrl-names = "default";
+			pinctrl-0 = <&pwm_pins>;
+			assigned-clock-rates = <100000000>;
+			status = "okay";
+		};
+	};
+
+};

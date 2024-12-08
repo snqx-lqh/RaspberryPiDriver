@@ -155,7 +155,7 @@ CROSS_COMPILE = arm-linux-gnueabihf-
 
 all:
     $(MAKE) -C $(KDIR) M=$(PWD) $(CROSS)  modules
-    $(CROSS_COMPILE)gcc -o led_drv_cdev_app led_drv_cdev_app.c
+    $(CROSS_COMPILE)gcc -o led_drv_app led_drv_app.c
 
 .PHONY: clean
 clean:

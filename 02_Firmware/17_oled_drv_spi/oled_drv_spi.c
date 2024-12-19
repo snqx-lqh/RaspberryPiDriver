@@ -77,14 +77,14 @@ static int oled_drv_release(struct inode *inode, struct file *file)
 	return 0;
 }
 
-// 通过文件读取，得到当前LED的状态
+ 
 ssize_t oled_drv_read(struct file* filp, char __user* buf, size_t len, loff_t* off)
 {
 
     return 0;
 }
 
-// 通过向文件写入
+ 
 ssize_t oled_drv_write(struct file* filp, const char __user* buf, size_t len, loff_t* off)
 {
     long err = 0;
@@ -94,11 +94,9 @@ ssize_t oled_drv_write(struct file* filp, const char __user* buf, size_t len, lo
 	err = copy_from_user(data, buf, len);
 
     if (data[0] == 0x40) { // 写数据
-        //gpiod_set_value(dev->dc_gpiod,1);
 		gpio_set_value(dev->dc_gpio,1);
     }
     else { // 写命令
-        //gpiod_set_value(dev->dc_gpiod,0);
 		gpio_set_value(dev->dc_gpio,0);
     }
     spi_write_len_data(dev, &data[1], 1);
@@ -110,12 +108,10 @@ long oled_drv_ioctl(struct file *filp, unsigned int cmd, unsigned long reg)
 {
 	if(reg == 0)
 	{
-		//gpiod_set_value(oled_dev.reset_gpiod,0);
 		gpio_set_value(oled_dev.reset_gpio,0);
 	}	
 	else if(reg == 1)
 	{
-		//gpiod_set_value(oled_dev.reset_gpiod,1);
 		gpio_set_value(oled_dev.reset_gpio,1);
 	}
 	return 0;
@@ -144,14 +140,6 @@ static int ssd1306_probe(struct spi_device *spi)
 	spi->mode = SPI_MODE_0;	/*MODE0，CPOL=0，CPHA=0*/
 	spi_setup(spi);
 	oled_dev.private_data = spi; /* 设置私有数据 */
-	
-	// // 获取GPIO描述符
-    // oled_dev.reset_gpiod = gpiod_get(&spi->dev,"reset",0);
-    // oled_dev.dc_gpiod    = gpiod_get(&spi->dev,"dc"   ,0);
-
-	// //设置gpio为输出模式，同时初始化为低电平
-    // ret = gpiod_direction_output(oled_dev.reset_gpiod, 0);
-    // ret = gpiod_direction_output(oled_dev.dc_gpiod, 0);
 
 	//读节点信息 
     oled_dev.node = spi->dev.of_node;            

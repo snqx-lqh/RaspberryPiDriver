@@ -162,7 +162,7 @@ docker load < rpi3b-plus-env.image.tar
 sudo docker run -it --name rpi3b-plus-env \
 -p 8022:22 \
 -v /home/lqh/rpi3b_plus_workspace:/home \
-rpi3b-plus-env.image:lasted /bin/bash
+rpi3b-plus-env.image:latest /bin/bash
 ```
 
 ## 简易测试

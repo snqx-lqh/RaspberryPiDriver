@@ -35,13 +35,13 @@ static int pcf8591_read_regs(pcf8591_dev_t *dev, u8 reg, void *val, int len)
 	struct i2c_client *client = (struct i2c_client *)dev->client;
 
 	/* msg[0]为发送要读取的首地址 */
-	msg[0].addr = client->addr;			/* mpu6050地址 */
+	msg[0].addr = client->addr;			/* pcf8591地址 */
 	msg[0].flags = 0;					/* 标记为发送数据 */
 	msg[0].buf = &reg;					/* 读取的首地址 */
 	msg[0].len = 1;						/* reg长度*/
 
 	/* msg[1]读取数据 */
-	msg[1].addr = client->addr;			/* mpu6050地址 */
+	msg[1].addr = client->addr;			/* pcf8591地址 */
 	msg[1].flags = I2C_M_RD;			/* 标记为读取数据*/
 	msg[1].buf = val;					/* 读取数据缓冲区 */
 	msg[1].len = len;					/* 要读取的数据长度*/
@@ -65,11 +65,11 @@ static s32 pcf8591_write_regs(pcf8591_dev_t *dev, u8 reg, u8 *buf, u8 len)
 	b[0] = reg;					/* 寄存器首地址 */
 	memcpy(&b[1],buf,len);		/* 将要写入的数据拷贝到数组b里面 */
 		
-	msg.addr = client->addr;	/* mpu6050地址 */
+	msg.addr = client->addr;	/* pcf8591地址 */
 	msg.flags = 0;				/* 标记为写数据 */
 
 	msg.buf = b;				/* 要写入的数据缓冲区 */
-	msg.len = len + 1;			/* 要写入的数据长度 */
+	msg.len = len + 1;			/* 要写入的数据长度   */
 
 	return i2c_transfer(client->adapter, &msg, 1);
 }
@@ -95,7 +95,6 @@ void pcf8591_write_data(pcf8591_dev_t *dev,uint8_t dac_value)
     pcf8591_write_regs(dev,0x40,buf,1);
 }
 
-// 打开文件
 static int pcf8591_drv_open(struct inode *inode, struct file *file)
 {
     file->private_data = &pcf8591_dev;
@@ -103,14 +102,12 @@ static int pcf8591_drv_open(struct inode *inode, struct file *file)
 	return 0;
 }
 
-// 关闭文件
 static int pcf8591_drv_release(struct inode *inode, struct file *file)
 {
 	printk("%s %s line %d\r\n", __FILE__, __FUNCTION__, __LINE__);
 	return 0;
 }
 
-// 通过文件读取，得到当前LED的状态
 ssize_t pcf8591_drv_read(struct file* filp, char __user* buf, size_t len, loff_t* off)
 {
     uint8_t data[4];
@@ -127,7 +124,6 @@ ssize_t pcf8591_drv_read(struct file* filp, char __user* buf, size_t len, loff_t
     return 0;
 }
 
-// 通过向文件写入LED状态，控制LED灯
 ssize_t pcf8591_drv_write(struct file* filp, const char __user* buf, size_t len, loff_t* off)
 {
     long err = 0;

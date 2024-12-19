@@ -36,7 +36,7 @@ typedef struct{
     dev_t devid; /* 设备号 */
     struct cdev cdev; /* cdev */
     struct device_node *node; /* KEY 设备节点 */
-    key_gpio_t key_gpio[4];
+    key_gpio_t key_gpio[3];
 }key_dev_t;
 
 static key_dev_t key_dev;
